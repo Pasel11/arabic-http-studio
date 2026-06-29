@@ -250,7 +250,7 @@
   "cacheControl": "Cache-Control",
   "contentTypeJson": "application/json",
   "contentTypeXml": "application/xml",
-  "ContentTypeFormUrlEncoded": "application/x-www-form-urlencoded",
+  "contentTypeFormUrlEncoded": "application/x-www-form-urlencoded",
   "contentTypeMultipart": "multipart/form-data",
   "contentTypeText": "text/plain",
   "contentTypeHtml": "text/html",
