@@ -1,22 +1,21 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
 
 import '../constants/app_constants.dart';
 import '../network/network_service.dart';
 import 'encryption_service.dart';
 
-/// Initialization service for app startup
+/// Initialization service for app startup.
+///
+/// This service coordinates the initialization of all core services
+/// in the correct order.
 class InitializationService {
   InitializationService._();
   static final InitializationService instance = InitializationService._();
 
-  final _secureStorage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-
   bool _initialized = false;
   bool get isInitialized => _initialized;
 
+  /// Initializes all application services.
   Future<void> initialize() async {
     if (_initialized) return;
 
@@ -53,7 +52,4 @@ class InitializationService {
       }
     }
   }
-
-  /// Get secure storage
-  FlutterSecureStorage get secureStorage => _secureStorage;
 }

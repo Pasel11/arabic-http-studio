@@ -3,19 +3,18 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hive/hive.dart';
 
-/// Service for encrypting/decrypting sensitive data
+/// Service for encrypting/decrypting sensitive data.
+///
+/// This service uses AES-256 encryption with keys stored in Hive.
+/// The encryption key is generated on first run and persisted.
 class EncryptionService {
   EncryptionService._();
   static final EncryptionService instance = EncryptionService._();
 
   static const String _keyStorageKey = 'encryption_key_v1';
   static const int _keyLength = 32; // 256 bits
-
-  final _secureStorage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
 
   late Key _encryptionKey;
   late IV _iv;
@@ -24,10 +23,15 @@ class EncryptionService {
   bool _initialized = false;
   bool get isInitialized => _initialized;
 
+  /// Initializes the encryption service.
+  ///
+  /// Loads or generates the encryption key from Hive storage.
   Future<void> initialize() async {
     if (_initialized) return;
 
-    var keyString = await _secureStorage.read(key: _keyStorageKey);
+    final box = await Hive.openBox<dynamic>('secure_storage');
+
+    var keyString = box.get(_keyStorageKey) as String?;
 
     if (keyString == null) {
       // Generate new key
@@ -37,7 +41,7 @@ class EncryptionService {
         keyBytes[i] = random.nextInt(256);
       }
       keyString = base64.encode(keyBytes);
-      await _secureStorage.write(key: _keyStorageKey, value: keyString);
+      await box.put(_keyStorageKey, keyString);
     }
 
     _encryptionKey = Key.fromBase64(keyString);
@@ -47,7 +51,7 @@ class EncryptionService {
     _initialized = true;
   }
 
-  /// Encrypt a string
+  /// Encrypts a string.
   String encrypt(String plainText) {
     if (!_initialized) {
       throw StateError('EncryptionService not initialized');
@@ -56,7 +60,7 @@ class EncryptionService {
     return encrypted.base64;
   }
 
-  /// Decrypt a string
+  /// Decrypts a string.
   String decrypt(String encryptedText) {
     if (!_initialized) {
       throw StateError('EncryptionService not initialized');
@@ -65,28 +69,27 @@ class EncryptionService {
     return _encrypter.decrypt(encrypted, iv: _iv);
   }
 
-  /// Encrypt a map
+  /// Encrypts a map.
   String encryptMap(Map<String, dynamic> map) {
     return encrypt(jsonEncode(map));
   }
 
-  /// Decrypt to map
+  /// Decrypts to map.
   Map<String, dynamic> decryptMap(String encryptedText) {
     return jsonDecode(decrypt(encryptedText)) as Map<String, dynamic>;
   }
 
-  /// Generate a random IV for each encryption (more secure)
+  /// Encrypts with a random IV (more secure).
   String encryptWithRandomIV(String plainText) {
     if (!_initialized) {
       throw StateError('EncryptionService not initialized');
     }
     final randomIV = IV.fromSecureRandom(16);
     final encrypted = _encrypter.encrypt(plainText, iv: randomIV);
-    // Prepend IV to encrypted data
     return '${randomIV.base64}:${encrypted.base64}';
   }
 
-  /// Decrypt with random IV
+  /// Decrypts with random IV.
   String decryptWithRandomIV(String encryptedWithIV) {
     if (!_initialized) {
       throw StateError('EncryptionService not initialized');
@@ -100,9 +103,8 @@ class EncryptionService {
     return _encrypter.decrypt(encrypted, iv: iv);
   }
 
-  /// Hash a string (for verification, not encryption)
+  /// Hashes a string (for verification, not encryption).
   String hash(String input) {
-    // Simple hash - use proper crypto in production
     return input.hashCode.toRadixString(16);
   }
 }

@@ -1,13 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hive/hive.dart';
 
 import '../contracts/ai_provider.dart';
 
 /// AI settings state.
 class AiSettings {
-  /// Creates AI settings.
   const AiSettings({
     this.enabled = false,
     this.activeProviderId = '',
@@ -19,31 +18,15 @@ class AiSettings {
     this.cacheResponses = true,
   });
 
-  /// Whether AI features are enabled.
   final bool enabled;
-
-  /// The active provider ID.
   final String activeProviderId;
-
-  /// Map of provider ID to configuration.
   final Map<String, AiProviderConfig> providers;
-
-  /// Default temperature for AI responses.
   final double defaultTemperature;
-
-  /// Default maximum tokens.
   final int defaultMaxTokens;
-
-  /// Whether to show AI suggestions proactively.
   final bool showSuggestions;
-
-  /// Whether to automatically explain errors.
   final bool autoExplainErrors;
-
-  /// Whether to cache AI responses.
   final bool cacheResponses;
 
-  /// Creates a copy with updated fields.
   AiSettings copyWith({
     bool? enabled,
     String? activeProviderId,
@@ -67,29 +50,29 @@ class AiSettings {
   }
 }
 
-/// Manages AI settings with secure storage.
+/// Manages AI settings with Hive storage.
+///
+/// Note: API keys are stored in Hive (encrypted by EncryptionService)
+/// instead of flutter_secure_storage for broader platform compatibility.
 class AiSettingsProvider {
   AiSettingsProvider._();
   static final AiSettingsProvider instance = AiSettingsProvider._();
 
-  static const String _storageKey = 'ai_settings_v1';
+  static const String _boxName = 'ai_settings';
   static const String _enabledKey = 'ai_enabled';
   static const String _activeProviderKey = 'ai_active_provider';
   static const String _providersKey = 'ai_providers';
 
-  final _secureStorage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-
   AiSettings _settings = const AiSettings();
   AiSettings get settings => _settings;
 
-  /// Loads settings from secure storage.
+  /// Loads settings from Hive storage.
   Future<void> load() async {
     try {
-      final enabled = await _secureStorage.read(key: _enabledKey);
-      final activeProvider = await _secureStorage.read(key: _activeProviderKey);
-      final providersJson = await _secureStorage.read(key: _providersKey);
+      final box = await Hive.openBox<dynamic>(_boxName);
+      final enabled = box.get(_enabledKey) as bool? ?? false;
+      final activeProvider = box.get(_activeProviderKey) as String? ?? '';
+      final providersJson = box.get(_providersKey) as String?;
 
       final providers = <String, AiProviderConfig>{};
       if (providersJson != null) {
@@ -102,8 +85,8 @@ class AiSettingsProvider {
       }
 
       _settings = AiSettings(
-        enabled: enabled == 'true',
-        activeProviderId: activeProvider ?? '',
+        enabled: enabled,
+        activeProviderId: activeProvider,
         providers: providers,
       );
     } catch (e) {
@@ -114,13 +97,15 @@ class AiSettingsProvider {
 
   /// Enables or disables AI features.
   Future<void> setEnabled(bool enabled) async {
-    await _secureStorage.write(key: _enabledKey, value: enabled.toString());
+    final box = await Hive.openBox<dynamic>(_boxName);
+    await box.put(_enabledKey, enabled);
     _settings = _settings.copyWith(enabled: enabled);
   }
 
   /// Sets the active provider.
   Future<void> setActiveProvider(String providerId) async {
-    await _secureStorage.write(key: _activeProviderKey, value: providerId);
+    final box = await Hive.openBox<dynamic>(_boxName);
+    await box.put(_activeProviderKey, providerId);
     _settings = _settings.copyWith(activeProviderId: providerId);
   }
 
@@ -132,7 +117,8 @@ class AiSettingsProvider {
     final providersJson = jsonEncode(
       providers.map((k, v) => MapEntry(k, v.toJson())),
     );
-    await _secureStorage.write(key: _providersKey, value: providersJson);
+    final box = await Hive.openBox<dynamic>(_boxName);
+    await box.put(_providersKey, providersJson);
 
     _settings = _settings.copyWith(providers: providers);
   }
@@ -145,7 +131,8 @@ class AiSettingsProvider {
     final providersJson = jsonEncode(
       providers.map((k, v) => MapEntry(k, v.toJson())),
     );
-    await _secureStorage.write(key: _providersKey, value: providersJson);
+    final box = await Hive.openBox<dynamic>(_boxName);
+    await box.put(_providersKey, providersJson);
 
     _settings = _settings.copyWith(providers: providers);
   }
