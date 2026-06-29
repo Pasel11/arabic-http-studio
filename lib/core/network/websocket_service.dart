@@ -485,7 +485,7 @@ class _SseConnection {
         buffer.write(utf8.decode(data));
 
         // Process complete events (separated by \n\n)
-        while (buffer.contains('\n\n')) {
+        while (buffer.toString().contains('\n\n')) {
           final eventEnd = buffer.toString().indexOf('\n\n');
           final eventData = buffer.toString().substring(0, eventEnd);
           buffer.clear();
@@ -542,7 +542,6 @@ class _SseConnection {
 
   Future<void> disconnect() async {
     await _subscription?.cancel();
-    _response?.detach();
-    _client?.close();
+    _client?.close(force: true);
   }
 }

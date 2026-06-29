@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import '../models/http_request.dart';
+import '../../request/models/http_request.dart';
 import '../models/collection_import_models.dart';
 
 /// Service for importing API definitions from various formats.

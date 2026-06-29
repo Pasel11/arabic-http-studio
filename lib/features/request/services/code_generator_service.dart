@@ -374,7 +374,7 @@ class CodeGeneratorService {
     buffer.writeln("    let data = '';");
     buffer.writeln("    res.on('data', (chunk) => { data += chunk; });");
     buffer.writeln("    res.on('end', () => {");
-    buffer.writeln('        console.log(`Status: ${res.statusCode}`);');
+    buffer.writeln('        console.log(`Status: \${res.statusCode}`);');
     buffer.writeln('        console.log(data);');
     buffer.writeln('    });');
     buffer.writeln('});');
@@ -582,7 +582,7 @@ class CodeGeneratorService {
     buffer.writeln();
     buffer.writeln('axios(config)');
     buffer.writeln('    .then(response => {');
-    buffer.writeln('        console.log(`Status: ${response.status}`);');
+    buffer.writeln('        console.log(`Status: \${response.status}`);');
     buffer.writeln('        console.log(response.data);');
     buffer.writeln('    })');
     buffer.writeln('    .catch(error => {');

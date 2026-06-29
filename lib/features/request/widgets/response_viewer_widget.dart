@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -207,7 +208,7 @@ class _ResponseViewerWidgetState extends State<ResponseViewerWidget>
     // If it's an image, show image preview
     if (contentType.contains('image')) {
       return Image.memory(
-        response.bodyBytes,
+        Uint8List.fromList(response.bodyBytes),
         errorBuilder: (context, error, _) => _buildCodeView(context, 'فشل تحميل الصورة: $error'),
       );
     }

@@ -424,6 +424,18 @@ class FormFieldItem {
       enabled: json['enabled'] as bool? ?? true,
     );
   }
+
+  FormFieldItem copyWith({
+    String? key,
+    String? value,
+    bool? enabled,
+  }) {
+    return FormFieldItem(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      enabled: enabled ?? this.enabled,
+    );
+  }
 }
 
 class FileFieldItem {

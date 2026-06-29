@@ -1,4 +1,4 @@
-import '../request/models/http_request.dart';
+import '../../request/models/http_request.dart';
 
 /// Represents a collection/folder imported from external sources.
 class CollectionFolder {
