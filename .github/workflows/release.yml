@@ -9,9 +9,6 @@ env:
   FLUTTER_VERSION: '3.16.0'
 
 jobs:
-  # ============================================================================
-  # Build Android Release
-  # ============================================================================
   build-android:
     name: Build Android Release
     runs-on: ubuntu-latest
@@ -41,27 +38,19 @@ jobs:
           echo "flutter.buildMode=release" >> android/local.properties
 
       - name: Install dependencies
-        run: flutter pub get || true
+        run: flutter pub get
 
       - name: Build Release APK
-        run: flutter build apk --release || true
-
-      - name: Build App Bundle
-        run: flutter build appbundle --release || true
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-release-apk
-          path: |
-            build/app/outputs/flutter-apk/*.apk
-            build/app/outputs/bundle/release/*.aab
+          path: build/app/outputs/flutter-apk/*.apk
           retention-days: 90
-          if-no-files-found: ignore
+          if-no-files-found: warn
 
-  # ============================================================================
-  # Create GitHub Release
-  # ============================================================================
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
@@ -81,7 +70,7 @@ jobs:
         continue-on-error: true
 
       - name: List artifacts
-        run: ls -la artifacts/ 2>/dev/null || echo "No artifacts found"
+        run: ls -la artifacts/ 2>/dev/null || echo "No artifacts"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -91,55 +80,25 @@ jobs:
           body: |
             # 🚀 Arabic HTTP Studio ${{ github.ref_name }}
 
-            ## ✨ الميزات الرئيسية
+            ## ✨ الميزات
 
-            ### 🤖 الذكاء الاصطناعي
-            - شرح أخطاء HTTP تلقائيًا
-            - اقتراح إصلاحات للطلبات الفاشلة
-            - تحسين الرؤوس والمصادقة
-            - تلخيص الاستجابات
-            - توليد كود بـ 12 لغة
-            - دعم أي مزود OpenAI-compatible
-
-            ### 🔌 نظام الإضافات (Plugins)
-            - بنية قابلة للتوسع
-            - تسجيل أدوات ومزودين مخصصين
-
-            ### 🛠️ الأدوات
-            - أدوات JSON (Formatter, Validator, Compare, Tree, Search, Statistics)
-            - أدوات XML (Formatter, Validator, Tree, Compare)
-            - أدوات الترميز (Base64, URL, Unicode, Hex)
-            - أدوات التشفير (MD5, SHA1, SHA256, SHA512, HMAC)
-            - مستكشف الملفات
-            - إدارة الجلسات والمقارنة
-
-            ### 📊 التقارير
-            - تقارير شاملة (Markdown, HTML)
-            - إحصائيات الأداء
-
-            ### 🎨 الواجهة
-            - Material 3 / Material You
-            - دعم كامل للعربية (RTL)
-            - وضع ليلي/نهاري
-            - Dynamic Color
-
-            ### 🏗️ البنية
-            - Clean Architecture
-            - Riverpod لإدارة الحالة
-            - 19 ملف اختبار
-            - توثيق شامل
+            - 🤖 ذكاء اصطناعي مدمج (OpenAI-compatible)
+            - 🔌 نظام إضافات (Plugins)
+            - 🛠️ أدوات JSON/XML/Base64/Hash
+            - 📋 إدارة جلسات ومقارنة
+            - 📊 تقارير احترافية
+            - 🎨 Material 3 مع دعم كامل للعربية RTL
+            - 🏗️ Clean Architecture مع Riverpod
 
             ## 📦 التنزيلات
 
-            قد تجد ملفات APK في قسم Artifacts إذا تم بناؤها بنجاح.
+            حمّل ملف APK من قسم Assets أدناه.
 
             ## 📝 ملاحظات
 
             - يدعم Android 5.0+ (API 21+)
             - يدعم اللغة العربية والإنجليزية
-            - الإصدار الأول للنسخة المؤسسية
           draft: false
           prerelease: false
           files: |
             artifacts/*.apk
-            artifacts/*.aab

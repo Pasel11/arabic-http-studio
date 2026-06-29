@@ -87,3 +87,4 @@ coverage/
 
 # Google Services
 google-services.json
+android/local.properties
