@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'app/app.dart';
 import 'core/database/hive_setup.dart';
 import 'core/services/initialization_service.dart';
+import 'features/ai/contracts/ai_provider.dart';
 import 'features/ai/providers/ai_provider_registry.dart';
 import 'features/ai/providers/ai_settings_provider.dart';
 import 'features/ai/providers/openai_compatible_provider.dart';

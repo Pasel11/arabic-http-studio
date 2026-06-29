@@ -448,7 +448,6 @@ class _WebSocketScreenState extends ConsumerState<WebSocketScreen>
                     Switch(
                       value: _autoScroll,
                       onChanged: (value) => setState(() => _autoScroll = value),
-                      dense: true,
                     ),
                   ],
                 ),
@@ -549,7 +548,6 @@ class _WebSocketScreenState extends ConsumerState<WebSocketScreen>
         setState(() => _filterType = type);
         _applyFilters();
       },
-      dense: true,
     );
   }
 
