@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
 
 import '../models/http_request.dart';
 import '../providers/request_provider.dart';
@@ -18,6 +17,12 @@ class _RequestBodyWidgetState extends ConsumerState<RequestBodyWidget> {
   String _bodyType = 'none';
 
   @override
+  void initState() {
+    super.initState();
+    _bodyType = ref.read(currentRequestProvider)?.body?.type ?? 'none';
+  }
+
+  @override
   Widget build(BuildContext context) {
     final request = ref.watch(currentRequestProvider);
     if (request == null) return const SizedBox.shrink();
@@ -30,7 +35,6 @@ class _RequestBodyWidgetState extends ConsumerState<RequestBodyWidget> {
       children: [
         Text('المتن', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        // Body type selector
         Wrap(
           spacing: 8,
           children: [
@@ -45,7 +49,6 @@ class _RequestBodyWidgetState extends ConsumerState<RequestBodyWidget> {
           ],
         ),
         const SizedBox(height: 16),
-        // Body content based on type
         _buildBodyContent(context, body),
       ],
     );
@@ -74,7 +77,8 @@ class _RequestBodyWidgetState extends ConsumerState<RequestBodyWidget> {
             padding: const EdgeInsets.all(32),
             child: Column(
               children: [
-                Icon(Icons.block, size: 48, color: Theme.of(context).colorScheme.outline),
+                Icon(Icons.block,
+                    size: 48, color: Theme.of(context).colorScheme.outline),
                 const SizedBox(height: 8),
                 const Text('لا يوجد متن'),
               ],
@@ -85,10 +89,7 @@ class _RequestBodyWidgetState extends ConsumerState<RequestBodyWidget> {
       case 'xml':
       case 'text':
       case 'html':
-        return _RawBodyEditor(
-          body: body,
-          type: _bodyType,
-        );
+        return _RawBodyEditor(body: body, type: _bodyType);
       case 'form':
         return _FormBodyEditor(body: body);
       case 'multipart':
@@ -103,7 +104,6 @@ class _RequestBodyWidgetState extends ConsumerState<RequestBodyWidget> {
 
 class _RawBodyEditor extends ConsumerStatefulWidget {
   const _RawBodyEditor({required this.body, required this.type});
-
   final BodyItem? body;
   final String type;
 
@@ -146,16 +146,11 @@ class _RawBodyEditorState extends ConsumerState<_RawBodyEditor> {
         TextField(
           controller: _controller,
           maxLines: 15,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-          ),
+          decoration: const InputDecoration(border: OutlineInputBorder()),
           style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 13),
           onChanged: (value) {
             ref.read(currentRequestProvider.notifier).updateBody(
-                  BodyItem(
-                    type: widget.type,
-                    rawContent: value,
-                  ),
+                  BodyItem(type: widget.type, rawContent: value),
                 );
           },
         ),
@@ -165,15 +160,11 @@ class _RawBodyEditorState extends ConsumerState<_RawBodyEditor> {
 
   void _formatJson() {
     try {
-      final text = _controller.text;
-      final decoded = jsonDecode(text);
+      final decoded = jsonDecode(_controller.text);
       final formatted = const JsonEncoder.withIndent('  ').convert(decoded);
       _controller.text = formatted;
       ref.read(currentRequestProvider.notifier).updateBody(
-            BodyItem(
-              type: widget.type,
-              rawContent: formatted,
-            ),
+            BodyItem(type: widget.type, rawContent: formatted),
           );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -185,7 +176,6 @@ class _RawBodyEditorState extends ConsumerState<_RawBodyEditor> {
 
 class _FormBodyEditor extends ConsumerStatefulWidget {
   const _FormBodyEditor({this.body});
-
   final BodyItem? body;
 
   @override
@@ -227,7 +217,8 @@ class _FormBodyEditorState extends ConsumerState<_FormBodyEditor> {
                 children: [
                   Switch(
                     value: field.enabled,
-                    onChanged: (value) => _updateField(index, field.copyWith(enabled: value)),
+                    onChanged: (value) =>
+                        _updateField(index, field.copyWith(enabled: value)),
                   ),
                   Expanded(
                     child: Column(
@@ -238,7 +229,12 @@ class _FormBodyEditorState extends ConsumerState<_FormBodyEditor> {
                             isDense: true,
                             border: OutlineInputBorder(),
                           ),
-                          onChanged: (value) => _updateField(index, FormFieldItem(key: value, value: field.value, enabled: field.enabled)),
+                          onChanged: (value) => _updateField(
+                              index,
+                              FormFieldItem(
+                                  key: value,
+                                  value: field.value,
+                                  enabled: field.enabled)),
                           controller: TextEditingController(text: field.key),
                         ),
                         const SizedBox(height: 8),
@@ -248,7 +244,12 @@ class _FormBodyEditorState extends ConsumerState<_FormBodyEditor> {
                             isDense: true,
                             border: OutlineInputBorder(),
                           ),
-                          onChanged: (value) => _updateField(index, FormFieldItem(key: field.key, value: value, enabled: field.enabled)),
+                          onChanged: (value) => _updateField(
+                              index,
+                              FormFieldItem(
+                                  key: field.key,
+                                  value: value,
+                                  enabled: field.enabled)),
                           controller: TextEditingController(text: field.value),
                         ),
                       ],
@@ -290,21 +291,18 @@ class _FormBodyEditorState extends ConsumerState<_FormBodyEditor> {
 
   void _saveBody() {
     ref.read(currentRequestProvider.notifier).updateBody(
-          BodyItem(
-            type: 'form',
-            formFields: _fields,
-          ),
+          BodyItem(type: 'form', formFields: _fields),
         );
   }
 }
 
 class _MultipartBodyEditor extends ConsumerStatefulWidget {
   const _MultipartBodyEditor({this.body});
-
   final BodyItem? body;
 
   @override
-  ConsumerState<_MultipartBodyEditor> createState() => _MultipartBodyEditorState();
+  ConsumerState<_MultipartBodyEditor> createState() =>
+      _MultipartBodyEditorState();
 }
 
 class _MultipartBodyEditorState extends ConsumerState<_MultipartBodyEditor> {
@@ -323,7 +321,6 @@ class _MultipartBodyEditorState extends ConsumerState<_MultipartBodyEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Form fields section
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -341,13 +338,13 @@ class _MultipartBodyEditorState extends ConsumerState<_MultipartBodyEditor> {
               subtitle: Text(entry.value.value),
               trailing: IconButton(
                 icon: const Icon(Icons.delete),
-                onPressed: () => setState(() => _formFields.removeAt(entry.key)),
+                onPressed: () =>
+                    setState(() => _formFields.removeAt(entry.key)),
               ),
             ),
           );
         }),
         const SizedBox(height: 16),
-        // File fields section
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -365,7 +362,8 @@ class _MultipartBodyEditorState extends ConsumerState<_MultipartBodyEditor> {
               subtitle: Text(entry.value.key),
               trailing: IconButton(
                 icon: const Icon(Icons.delete),
-                onPressed: () => setState(() => _fileFields.removeAt(entry.key)),
+                onPressed: () =>
+                    setState(() => _fileFields.removeAt(entry.key)),
               ),
             ),
           );
@@ -376,20 +374,47 @@ class _MultipartBodyEditorState extends ConsumerState<_MultipartBodyEditor> {
 
   void _addFormField() {
     setState(() {
-      _formFields.add(FormFieldItem(key: 'field${_formFields.length + 1}', value: ''));
+      _formFields
+          .add(FormFieldItem(key: 'field${_formFields.length + 1}', value: ''));
     });
     _saveBody();
   }
 
   Future<void> _addFileField() async {
-    final result = await FilePicker.platform.pickFiles();
-    if (result != null && result.files.isNotEmpty) {
-      final file = result.files.first;
+    // Instead of file_picker, use text input for file path
+    final pathController = TextEditingController();
+
+    final filePath = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('إضافة ملف'),
+        content: TextField(
+          controller: pathController,
+          decoration: const InputDecoration(
+            labelText: 'مسار الملف',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, pathController.text.trim()),
+            child: const Text('إضافة'),
+          ),
+        ],
+      ),
+    );
+
+    if (filePath != null && filePath.isNotEmpty) {
+      final fileName = filePath.split('/').last;
       setState(() {
         _fileFields.add(FileFieldItem(
           key: 'file${_fileFields.length + 1}',
-          filePath: file.path!,
-          fileName: file.name,
+          filePath: filePath,
+          fileName: fileName,
         ));
       });
       _saveBody();
@@ -409,7 +434,6 @@ class _MultipartBodyEditorState extends ConsumerState<_MultipartBodyEditor> {
 
 class _BinaryBodyEditor extends ConsumerStatefulWidget {
   const _BinaryBodyEditor({this.body});
-
   final BodyItem? body;
 
   @override
@@ -434,7 +458,8 @@ class _BinaryBodyEditorState extends ConsumerState<_BinaryBodyEditor> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Icon(Icons.upload_file, size: 64, color: Theme.of(context).primaryColor),
+            Icon(Icons.upload_file,
+                size: 64, color: Theme.of(context).primaryColor),
             const SizedBox(height: 16),
             Text(_fileName ?? 'لم يتم اختيار ملف'),
             const SizedBox(height: 16),
@@ -450,12 +475,36 @@ class _BinaryBodyEditorState extends ConsumerState<_BinaryBodyEditor> {
   }
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles();
-    if (result != null && result.files.isNotEmpty) {
-      final file = result.files.first;
+    final pathController = TextEditingController();
+
+    final filePath = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('اختر ملفًا'),
+        content: TextField(
+          controller: pathController,
+          decoration: const InputDecoration(
+            labelText: 'مسار الملف',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, pathController.text.trim()),
+            child: const Text('اختيار'),
+          ),
+        ],
+      ),
+    );
+
+    if (filePath != null && filePath.isNotEmpty) {
       setState(() {
-        _filePath = file.path;
-        _fileName = file.name;
+        _filePath = filePath;
+        _fileName = filePath.split('/').last;
       });
       ref.read(currentRequestProvider.notifier).updateBody(
             BodyItem(

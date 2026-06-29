@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:flutter/services.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../request/models/http_request.dart';
@@ -17,9 +16,6 @@ import '../services/export_service.dart';
 import '../services/import_service.dart';
 
 /// Export and Import screen.
-///
-/// This screen allows users to export their data in various formats
-/// and import data from external sources.
 class ExportScreen extends ConsumerStatefulWidget {
   const ExportScreen({super.key});
 
@@ -32,7 +28,6 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
   final _fileNameController =
       TextEditingController(text: 'arabic_http_studio_export');
 
-  /// All supported export formats with labels.
   static const _exportFormats = [
     {'value': 'json', 'label': 'JSON', 'icon': Icons.code},
     {'value': 'yaml', 'label': 'YAML', 'icon': Icons.code},
@@ -58,7 +53,6 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Export section
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -87,7 +81,8 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                         selected: _selectedFormat == format['value'],
                         onSelected: (selected) {
                           if (selected) {
-                            setState(() => _selectedFormat = format['value'] as String);
+                            setState(
+                                () => _selectedFormat = format['value'] as String);
                           }
                         },
                       );
@@ -116,8 +111,6 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Import section
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -134,10 +127,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'استورد بياناتك من ملف. الصيغ المدعومة:\n'
-                    '• OpenAPI 3.0 / Swagger 2.0\n'
-                    '• Postman Collections v2.1\n'
-                    '• JSON, YAML, CSV, TXT',
+                    'استورد بياناتك من ملف.\nالصيغ المدعومة: JSON, YAML, CSV, TXT',
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -145,40 +135,9 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _importData,
                       icon: const Icon(Icons.file_upload),
-                      label: const Text('اختر ملفًا للاستيراد'),
+                      label: const Text('أدخل مسار الملف للاستيراد'),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Info section
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.info, color: Theme.of(context).primaryColor),
-                      const SizedBox(width: 12),
-                      Text('معلومات',
-                          style: Theme.of(context).textTheme.titleMedium),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  const Text('سيتم تصدير جميع البيانات بما في ذلك:',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  const _ExportListItem(text: 'الطلبات المحفوظة'),
-                  const _ExportListItem(text: 'المحفوظات'),
-                  const _ExportListItem(text: 'المفضلة'),
-                  const _ExportListItem(text: 'المجموعات'),
-                  const _ExportListItem(text: 'البيئات'),
-                  const _ExportListItem(text: 'المتغيرات (بدون الأسرار المشفرة)'),
                 ],
               ),
             ),
@@ -197,38 +156,23 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
       final environments = ref.read(environmentRepositoryProvider).getAll();
       final variables = ref.read(variablesRepositoryProvider).getAll();
 
-      String filePath;
-
-      // Handle special formats
-      if (_selectedFormat == 'openapi' || _selectedFormat == 'swagger' || _selectedFormat == 'postman') {
-        filePath = await ExportService.instance.exportData(
-          requests: requests,
-          history: history,
-          favorites: favorites,
-          collections: collections,
-          environments: environments,
-          variables: variables,
-          format: _selectedFormat,
-          fileName: _fileNameController.text,
-        );
-      } else {
-        filePath = await ExportService.instance.exportData(
-          requests: requests,
-          history: history,
-          favorites: favorites,
-          collections: collections,
-          environments: environments,
-          variables: variables,
-          format: _selectedFormat,
-          fileName: _fileNameController.text,
-        );
-      }
+      final filePath = await ExportService.instance.exportData(
+        requests: requests,
+        history: history,
+        favorites: favorites,
+        collections: collections,
+        environments: environments,
+        variables: variables,
+        format: _selectedFormat,
+        fileName: _fileNameController.text,
+      );
 
       if (mounted) {
+        // Copy path to clipboard instead of sharing
+        await Clipboard.setData(ClipboardData(text: filePath));
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم التصدير بنجاح: $filePath')),
+          SnackBar(content: Text('تم التصدير بنجاح: $filePath (تم نسخ المسار)')),
         );
-        await Share.shareXFiles([XFile(filePath)]);
       }
     } catch (e) {
       if (mounted) {
@@ -240,12 +184,39 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
   }
 
   Future<void> _importData() async {
-    try {
-      final result = await FilePicker.platform.pickFiles();
-      if (result == null || result.files.isEmpty) return;
+    // Show dialog to input file path
+    final pathController = TextEditingController();
 
-      final filePath = result.files.first.path!;
-      final fileContent = await _readFile(filePath);
+    final filePath = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('استيراد من ملف'),
+        content: TextField(
+          controller: pathController,
+          decoration: const InputDecoration(
+            labelText: 'مسار الملف',
+            hintText: '/path/to/file.json',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, pathController.text.trim()),
+            child: const Text('استيراد'),
+          ),
+        ],
+      ),
+    );
+
+    if (filePath == null || filePath.isEmpty) return;
+
+    try {
+      final file = File(filePath);
+      final fileContent = await file.readAsString();
       final extension = filePath.split('.').last.toLowerCase();
 
       final importResult = ImportService.instance.importFromString(
@@ -253,7 +224,6 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         extension,
       );
 
-      // Save imported requests
       for (final request in importResult.requests) {
         await ref.read(requestRepositoryProvider).save(request);
       }
@@ -274,11 +244,6 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         );
       }
     }
-  }
-
-  Future<String> _readFile(String filePath) async {
-    final file = File(filePath);
-    return file.readAsString();
   }
 }
 
