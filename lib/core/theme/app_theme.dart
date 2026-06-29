@@ -27,6 +27,7 @@ class AppTheme {
   static const Color successColor = Color(0xFF34A853);
   static const Color warningColor = Color(0xFFFBBC04);
   static const Color infoColor = Color(0xFF4285F4);
+  static const Color errorColor = Color(0xFFEA4335);
 
   /// Method colors
   static const Color getColor = Color(0xFF34A853);
@@ -288,7 +289,7 @@ class AppTheme {
       case 'OPTIONS':
         return optionsColor;
       default:
-        return secondary;
+        return Colors.grey;
     }
   }
 
@@ -297,8 +298,8 @@ class AppTheme {
     if (status >= 200 && status < 300) return successColor;
     if (status >= 300 && status < 400) return infoColor;
     if (status >= 400 && status < 500) return warningColor;
-    if (status >= 500) return errorColor;
-    return secondary;
+    if (status >= 500) return Colors.red;
+    return Colors.grey;
   }
 }
 

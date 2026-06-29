@@ -53,7 +53,7 @@ class SettingsScreen extends ConsumerWidget {
                     radius: 12,
                   ),
                 IconButton(
-                  icon: const Icon(Icons.color_picker),
+                  icon: const Icon(Icons.color_lens),
                   onPressed: () => _pickColor(context, ref),
                 ),
               ],

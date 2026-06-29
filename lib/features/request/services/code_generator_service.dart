@@ -521,13 +521,13 @@ class CodeGeneratorService {
       buffer.writeln('            var response = await client.${_getMethodAsync(request.method)}("${request.fullUrl}");');
     }
 
-    buffer.writeln('            Console.WriteLine($"Status: {(int)response.StatusCode} {response.StatusCode}");');
+    buffer.writeln('            Console.WriteLine(\$"Status: {(int)response.StatusCode} {response.StatusCode}");');
     buffer.writeln('            var body = await response.Content.ReadAsStringAsync();');
-    buffer.writeln('            Console.WriteLine($"Response: {body}");');
+    buffer.writeln('            Console.WriteLine(\$"Response: {body}");');
     buffer.writeln('        }');
     buffer.writeln('        catch (Exception ex)');
     buffer.writeln('        {');
-    buffer.writeln('            Console.WriteLine($"Error: {ex.Message}");');
+    buffer.writeln('            Console.WriteLine(\$"Error: {ex.Message}");');
     buffer.writeln('        }');
     buffer.writeln('    }');
     buffer.writeln('}');

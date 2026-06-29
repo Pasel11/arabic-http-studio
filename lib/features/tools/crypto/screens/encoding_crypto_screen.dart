@@ -143,14 +143,14 @@ class _EncodingCryptoToolsScreenState extends State<EncodingCryptoToolsScreen>
       actions: [
         _ActionButton(
           label: 'ترميز',
-          icon: Icons.hexadecimal,
+          icon: Icons.code,
           onPressed: () => _setOutput(
             EncodingCryptoService.instance.hexEncode(_inputController.text),
           ),
         ),
         _ActionButton(
           label: 'فك الترميز',
-          icon: Icons.hexadecimal_outlined,
+          icon: Icons.code,
           onPressed: () => _setOutput(
             EncodingCryptoService.instance.hexDecode(_inputController.text),
           ),

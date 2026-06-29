@@ -244,7 +244,7 @@ class _WebSocketScreenState extends ConsumerState<WebSocketScreen>
               const Text('تمرير تلقائي'),
               const Spacer(),
               IconButton(
-                icon: const Icon(Icons.ping),
+                icon: const Icon(Icons.network_ping),
                 tooltip: 'Ping',
                 onPressed: _isConnected ? _sendPing : null,
               ),

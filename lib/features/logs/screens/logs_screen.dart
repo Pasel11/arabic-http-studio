@@ -103,7 +103,7 @@ class _LogsScreenState extends ConsumerState<LogsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.logs, size: 64, color: Theme.of(context).colorScheme.outline),
+          Icon(Icons.list_alt, size: 64, color: Theme.of(context).colorScheme.outline),
           const SizedBox(height: 16),
           const Text('لا توجد سجلات'),
         ],
