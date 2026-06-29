@@ -9,6 +9,7 @@ import 'core/services/initialization_service.dart';
 import 'features/ai/providers/ai_provider_registry.dart';
 import 'features/ai/providers/ai_settings_provider.dart';
 import 'features/ai/providers/openai_compatible_provider.dart';
+import 'features/ai/providers/gemini_ai_provider.dart';
 
 /// Entry point of the Arabic HTTP Studio application.
 ///
@@ -72,7 +73,15 @@ Future<void> _initializeAiProviders() async {
   if (settings.enabled && settings.activeProviderId.isNotEmpty) {
     final config = settings.providers[settings.activeProviderId];
     if (config != null) {
-      final provider = OpenAiCompatibleProvider(config);
+      AiProvider provider;
+      switch (config.providerId) {
+        case 'gemini':
+          provider = GeminiAiProvider(config);
+        case 'openai':
+        case 'custom':
+        default:
+          provider = OpenAiCompatibleProvider(config);
+      }
       AiProviderRegistry.instance.register(provider);
     }
   }

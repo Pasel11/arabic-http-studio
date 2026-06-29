@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل استخدام Arabic HTTP Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@page {
+    size: 720px 1020px;
+    margin: 0;
+}
+:root {
+    --c-bg: #ffffff;
+    --c-primary: #1A73E8;
+    --c-secondary: #34A853;
+    --c-accent: #FBBC04;
+    --c-danger: #EA4335;
+    --c-text: #202124;
+    --c-text-light: #5F6368;
+    --c-surface: #F8F9FA;
+    --c-border: #DADCE0;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 720px;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+}
+@media screen {
+    html {
+        height: auto;
+        display: flex;
+        justify-content: center;
+        background: #e0e0e0;
+    }
+    body {
+        margin: 20px auto;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+}
+
+/* Cover Page */
+.cover {
+    width: 720px;
+    height: 1020px;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #1A73E8 0%, #0D47A1 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    break-after: page;
+    overflow: hidden;
+    position: relative;
+}
+.cover::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+}
+.cover::after {
+    content: '';
+    position: absolute;
+    bottom: -150px;
+    left: -150px;
+    width: 500px;
+    height: 500px;
+    background: rgba(52, 168, 83, 0.1);
+    border-radius: 50%;
+}
+.cover-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+}
+.cover-title {
+    font-size: 52px;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+.cover-subtitle {
+    font-size: 22px;
+    font-weight: 400;
+    text-align: center;
+    opacity: 0.9;
+    margin-bottom: 40px;
+}
+.cover-icon {
+    font-size: 80px;
+    margin-bottom: 30px;
+}
+.cover-footer {
+    position: absolute;
+    bottom: 40px;
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+/* Main Content */
+.main-content {
+    padding: 50px 60px 40px 60px;
+}
+
+/* Chapter Headers */
+.chapter-header {
+    break-after: avoid;
+    break-inside: avoid;
+    margin-top: 28px;
+    margin-bottom: 16px;
+}
+.chapter-tag {
+    display: inline-block;
+    background: var(--c-primary);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.chapter-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--c-text);
+    margin-bottom: 8px;
+}
+.divider {
+    height: 3px;
+    width: 60px;
+    background: var(--c-accent);
+    border-radius: 2px;
+}
+
+/* Body Text */
+.body-text {
+    margin-bottom: 14px;
+    color: var(--c-text);
+}
+.body-text strong {
+    color: var(--c-primary);
+}
+
+/* Cards */
+.card {
+    break-inside: avoid;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-right: 4px solid var(--c-primary);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+}
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--c-primary);
+    margin-bottom: 8px;
+}
+.card-content {
+    font-size: 15px;
+    color: var(--c-text);
+    line-height: 1.6;
+}
+
+/* Steps */
+.step {
+    break-inside: avoid;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    background: var(--c-surface);
+    border-radius: 10px;
+}
+.step-number {
+    background: var(--c-primary);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+.step-content {
+    flex: 1;
+    font-size: 15px;
+}
+
+/* Tips */
+.tip {
+    break-inside: avoid;
+    background: #E8F5E9;
+    border-right: 4px solid var(--c-secondary);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+}
+.tip-label {
+    font-weight: 700;
+    color: var(--c-secondary);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+/* Warnings */
+.warning {
+    break-inside: avoid;
+    background: #FFF3E0;
+    border-right: 4px solid var(--c-accent);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+}
+.warning-label {
+    font-weight: 700;
+    color: #E65100;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+/* Code */
+.code-block {
+    break-inside: avoid;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    margin-bottom: 14px;
+    direction: ltr;
+    text-align: left;
+}
+
+/* Ending */
+.ending {
+    width: 720px;
+    height: 1020px;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #0D47A1 0%, #1A73E8 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    break-before: page;
+    overflow: hidden;
+    position: relative;
+}
+.ending::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+}
+.ending-text {
+    font-size: 36px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+    z-index: 1;
+}
+.ending-sub {
+    font-size: 18px;
+    text-align: center;
+    opacity: 0.8;
+    z-index: 1;
+}
+.ending-footer {
+    position: absolute;
+    bottom: 40px;
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+/* Feature Grid */
+.feature-grid {
+    break-inside: avoid;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.feature-item {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+.feature-icon {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+.feature-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--c-text);
+}
+</style>
+</head>
+<body>
+
+<!-- Cover -->
+<div class="cover">
+    <div class="cover-badge">الإصدار 2.0.0 | Enterprise Edition</div>
+    <div class="cover-icon">🚀</div>
+    <div class="cover-title">Arabic HTTP Studio</div>
+    <div class="cover-subtitle">دليل المستخدم الكامل<br>باللغة العامية المصرية</div>
+    <div class="cover-footer">استوديو احترافي لإدارة طلبات HTTP و WebSocket مع الذكاء الاصطناعي</div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+
+    <!-- Introduction -->
+    <div class="chapter-header">
+        <div class="chapter-tag">مقدمة</div>
+        <div class="chapter-title">إيه هو Arabic HTTP Studio؟</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        يا صاحبي، <strong>Arabic HTTP Studio</strong> ده تطبيق مهول جداً شغال على الموبايل، عملناه خصيصاً للمبرمجين والمطورين العرب اللي بيشتغلوا مع APIs وطلبات HTTP. يعني تخيل إنك بتستخدم Postman أو Insomnia بس عربي بالكامل ومعاه ذكاء اصطناعي.
+    </div>
+    <div class="body-text">
+        التطبيق ده بيساعدك تبعت طلبات HTTP من نوعيات مختلفة (GET, POST, PUT, DELETE وغيرها)، تتصل بـ WebSocket، تختبر APIs، وتعمل كل حاجة من موبايلك أو تابلتك من غير ما تحتاج كمبيوتر.
+    </div>
+
+    <div class="card">
+        <div class="card-title">💡 أكتر ميزة تميز التطبيق</div>
+        <div class="card-content">
+            التطبيق فيه <strong>ذكاء اصطناعي مدمج</strong>! يعني تقدر تخليه يشرحلك الأخطاء، يقترحلك إصلاحات، يحسنلك الـ Headers، وحتى يولّدلك كود بـ 12 لغة برمجة مختلفة من الطلب اللي بتعمله.
+        </div>
+    </div>
+
+    <!-- Getting Started -->
+    <div class="chapter-header">
+        <div class="chapter-tag">البداية</div>
+        <div class="chapter-title">إزاي تحمل وتثبت التطبيق</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            <strong>حمّل ملف APK</strong> من صفحة الإصدارات على GitHub. هتلاقي ملف اسمه <code>app-release.apk</code>.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <strong>فعّل التثبيت من مصادر غير معروفة</strong>: روح على إعدادات الموبايل → الأمان → فعّل "تثبيت التطبيقات من مصادر غير معروفة".
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <strong>افتح ملف APK</strong> واضغط "تثبيت". الاستغراق هياخد حوالي دقيقة.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+            <strong>افتح التطبيق</strong> وهتلاقي الشاشة الرئيسية جاهزة للاستخدام!
+        </div>
+    </div>
+
+    <div class="warning">
+        <div class="warning-label">⚠️ مهم</div>
+        <div>التطبيق بيدعم Android 5.0 (API 21) فما فوق. لو موبايلك قديم شوية مش هيزن، التطبيق هيشتغل تمام.</div>
+    </div>
+
+    <!-- Home Screen -->
+    <div class="chapter-header">
+        <div class="chapter-tag">الشاشة الرئيسية</div>
+        <div class="chapter-title">إزاي تتنقل في التطبيق</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        لما تفتح التطبيق، هتلاقي <strong>شريط تنقل تحت</strong> فيه 5 تبويبات أساسية:
+    </div>
+
+    <div class="feature-grid">
+        <div class="feature-item">
+            <div class="feature-icon">🏠</div>
+            <div class="feature-name">الرئيسية</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">📜</div>
+            <div class="feature-name">المحفوظات</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🛠️</div>
+            <div class="feature-name">الأدوات</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">⭐</div>
+            <div class="feature-name">المفضلة</div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">⚙️</div>
+            <div class="feature-name">الإعدادات</div>
+        </div>
+    </div>
+
+    <div class="body-text">
+        وفي الشاشة الرئيسية نفسها هتلاقي <strong>إجراءات سريعة</strong> زي: طلب HTTP جديد، WebSocket، المجموعات، المتغيرات، البيئات، المصادقة، وغيرها. كل اللي تعمله ضغطة واحدة!
+    </div>
+
+    <!-- Sending Requests -->
+    <div class="chapter-header">
+        <div class="chapter-tag">الطلبات</div>
+        <div class="chapter-title">إزاي تبت طلب HTTP</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            اضغط على زر <strong>"طلب جديد"</strong> (الزر الأزرق الكبير اللي تحت).
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <strong>اكتب اسم الطلب</strong> عشان تقدر تلاقيه بعدين.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <strong>اختر الطريقة</strong>: GET، POST، PUT، DELETE، PATCH، HEAD، أو OPTIONS.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+            <strong>اكتب الرابط (URL)</strong> بتاع الـ API اللي عايز تختبره.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+            <strong>ضيف Headers لو محتاج</strong>: اضغط على تبويب "الرؤوس" وضيف أي هيدرزي Content-Type أو Authorization.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+            <strong>ضيف Body لو محتاج</strong>: للـ POST و PUT، اضغط على تبويب "المتن" واختار نوع المتن (JSON، XML، Form، إلخ).
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">7</div>
+        <div class="step-content">
+            <strong>اضغط "إرسال"</strong> والاستجابة هتظهر قدامك على طول!
+        </div>
+    </div>
+
+    <div class="tip">
+        <div class="tip-label">💡 نصيحة</div>
+        <div>تقدر تحفظ الطلب عشان ترجعله بعدين عن طريق زر "حفظ" فوق على اليمين. كمان تقدر تضيفه للمفضلة من القائمة.</div>
+    </div>
+
+    <!-- Response Viewer -->
+    <div class="chapter-header">
+        <div class="chapter-tag">الاستجابة</div>
+        <div class="chapter-title">إزاي تقرا الاستجابة</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        بعد ما تبعت الطلب، الاستجابة هتظهر في تبويب "الاستجابة" وفيها:
+    </div>
+
+    <div class="card">
+        <div class="card-title">📊 معلومات الاستجابة</div>
+        <div class="card-content">
+            • <strong>رمز الحالة</strong>: زي 200 (نجاح) أو 404 (مش موجود) أو 500 (خطأ سيرفر)<br>
+            • <strong>زمن الاستجابة</strong>: قدامك بالملي ثانية<br>
+            • <strong>حجم الاستجابة</strong>: بالبايت<br>
+            • <strong>نوع المحتوى</strong>: JSON, XML, HTML, إلخ
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">👀 طرق عرض الاستجابة</div>
+        <div class="card-content">
+            • <strong>منسّق</strong>: بيظهر الـ JSON بشكل جميل ومنظم<br>
+            • <strong>خام</strong>: النص الخام زي ما جا<br>
+            • <strong>Hex</strong>: عرض بالنظام الست عشري<br>
+            • <strong>Base64</strong>: عرض مشفر<br>
+            • تقدر <strong>تدور</strong> في الاستجابة بكتابة كلمة البحث
+        </div>
+    </div>
+
+    <!-- Authentication -->
+    <div class="chapter-header">
+        <div class="chapter-tag">المصادقة</div>
+        <div class="chapter-title">إزاي تضيف مصادقة للطلب</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        لو الـ API بتاعك محمي ومحتاج مصادقة، التطبيق بيدعم أنواع كتير:
+    </div>
+
+    <div class="card">
+        <div class="card-title">🔐 أنواع المصادقة المدعومة</div>
+        <div class="card-content">
+            • <strong>Bearer Token</strong>: الأكثر شيوعاً، بتكتب التوكن وبس<br>
+            • <strong>Basic Auth</strong>: اسم مستخدم وكلمة مرور<br>
+            • <strong>Digest Auth</strong>: مصادقة متقدمة<br>
+            • <strong>API Key</strong>: مفتاح في الهيدر أو الـ URL<br>
+            • <strong>JWT</strong>: توكن JSON Web Token<br>
+            • <strong>مخصص</strong>: تضيف هيدرز زي ما انت عايز
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            في شاشة الطلب، اضغط على تبويب <strong>"المصادقة"</strong>.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            اختار نوع المصادقة من القائمة.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            اكتب البيانات المطلوبة (توكن، اسم مستخدم، كلمة مرور، إلخ).
+        </div>
+    </div>
+
+    <!-- AI Features -->
+    <div class="chapter-header">
+        <div class="chapter-tag">الذكاء الاصطناعي</div>
+        <div class="chapter-title">إزاي تستخدم الـ AI</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        دي أكتر ميزة مميزة في التطبيق! تقدر تستخدم الذكاء الاصطناعي يشتغل معاك ويساعدك في شغلك.
+    </div>
+
+    <div class="card">
+        <div class="card-title">🤖 المزودين المدعومين</div>
+        <div class="card-content">
+            • <strong>OpenAI</strong>: GPT-3.5 و GPT-4<br>
+            • <strong>Google Gemini</strong>: gemini-2.5-flash و gemini-2.5-pro<br>
+            • <strong>مخصص</strong>: أي API متوافق مع OpenAI
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            روح على <strong>الإعدادات → أدوات → مساعد AI</strong>.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            اضغط على <strong>أيقونة الإعدادات</strong> وفعّل الذكاء الاصطناعي.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            اختار المزود: <strong>OpenAI</strong> أو <strong>Google Gemini</strong>.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+            اكتب الـ <strong>API Key</strong> بتاعك (من OpenAI أو Google AI Studio).
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+            اضغط <strong>"اختبار الاتصال"</strong> عشان تتأكد إن المفتاح شغال.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+            احفظ الإعدادات وابدأ استخدام الـ AI!
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">✨ إيه اللي تقدر تعمله بالـ AI</div>
+        <div class="card-content">
+            • <strong>شرح الأخطاء</strong>: لو جالك خطأ 404 أو 500، الـ AI يشرحلك سببه<br>
+            • <strong>اقتراح إصلاحات</strong>: يقولك إزاي تصلح الطلب الفاشل<br>
+            • <strong>تحسين الرؤوس</strong>: يقترح هيدرز أحسن<br>
+            • <strong>تلخيص الاستجابة</strong>: لو الاستجابة طويلة، يلخصهالك<br>
+            • <strong>توليد كود</strong>: يعملك كود بـ 12 لغة من الطلب<br>
+            • <strong>إنشاء طلب</strong>: اكتب وصف نصي والـ AI يعملك طلب جاهز
+        </div>
+    </div>
+
+    <div class="tip">
+        <div class="tip-label">💡 نصيحة عن Gemini</div>
+        <div>لو معندكش OpenAI، استخدم <strong>Google Gemini</strong> ليه فتره تجريبية مجانية! روح على Google AI Studio واعمل حساب واخد مفتاح API مجاني.</div>
+    </div>
+
+    <!-- WebSocket -->
+    <div class="chapter-header">
+        <div class="chapter-tag">WebSocket</div>
+        <div class="chapter-title">إزاي تتصل بـ WebSocket</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        التطبيق بيدعم <strong>WebSocket</strong> بشكل كامل، وده بيخليك تقدر تتصل بالسيرفرز اللي بتبعت بيانات في الوقت الحقيقي زي المحادثات والإشعارات.
+    </div>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            من الشاشة الرئيسية، اضغط على <strong>"WebSocket"</strong> من الإجراءات السريعة.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            اكتب رابط الـ WebSocket (بيبدأ بـ <code>ws://</code> أو <code>wss://</code>).
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            اضغط <strong>"اتصال"</strong> وهتلاقي مؤشر الحالة اتغير لـ "متصل".
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+            اكتب رسالة في الخانة تحت واضغط <strong>"إرسال"</strong>.
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📊 مميزات شاشة WebSocket المطورة</div>
+        <div class="card-content">
+            • <strong>إحصائيات لحظية</strong>: مدة الاتصال، عدد الرسائل، حجم البيانات<br>
+            • <strong>بحث وفلترة</strong>: دور على رسائل معينة أو فلتر حسب النوع<br>
+            • <strong>قوالب جاهزة</strong>: رسائل سريعة جاهزة للاستخدام<br>
+            • <strong>إعادة اتصال تلقائي</strong>: لو الاتصال قطع، بيحاول يرجع لوحده<br>
+            • <strong>تصدير الرسائل</strong>: احفظ المحادثة كلها
+        </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="chapter-header">
+        <div class="chapter-tag">الأدوات</div>
+        <div class="chapter-title">الأدوات المساعدة</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        التطبيق فيه مجموعة أدوات قوية جداً بتساعدك في شغلك اليومي:
+    </div>
+
+    <div class="card">
+        <div class="card-title">🔧 أدوات JSON</div>
+        <div class="card-content">
+            • <strong>Formatter</strong>: بيجمل الـ JSON<br>
+            • <strong>Validator</strong>: بيتأكد إن الـ JSON صحيح<br>
+            • <strong>Compare</strong>: بيقارن ملفين JSON<br>
+            • <strong>Tree</strong>: بيعرض الـ JSON كشجرة<br>
+            • <strong>Search</strong>: بيدور في الـ JSON<br>
+            • <strong>Statistics</strong>: إحصائيات عن الـ JSON
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🔐 أدوات الترميز والتشفير</div>
+        <div class="card-content">
+            • <strong>Base64</strong>: ترميز وفك ترميز<br>
+            • <strong>URL Encode</strong>: ترميز الروابط<br>
+            • <strong>Hash</strong>: MD5, SHA1, SHA256, SHA512<br>
+            • <strong>HMAC</strong>: للتوقيعات الأمنية
+        </div>
+    </div>
+
+    <!-- Sessions -->
+    <div class="chapter-header">
+        <div class="chapter-tag">الجلسات</div>
+        <div class="chapter-title">إزاي تحفظ الجلسات</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        <strong>الجلسة</strong> دي مجموعة طلبات بتشتغلهم سوا في تسلسل معين. يعني مثلاً لما تختبر API كامل (تسجيل دخول، جلب بيانات، تحديث، خروج) - دي جلسة كاملة.
+    </div>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            روح على <strong>الأدوات → الجلسات</strong>.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            اضغط <strong>"+" وأنشئ جلسة جديدة</strong>.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            ضيف الطلبات للجلسة ورتبها بالترتيب اللي عايزه.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+            احفظ الجلسة عشان ترجعلهابسرعة بعدين.
+        </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="chapter-header">
+        <div class="chapter-tag">الإعدادات</div>
+        <div class="chapter-title">إزاي تظبط التطبيق</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">⚙️ أهم الإعدادات</div>
+        <div class="card-content">
+            • <strong>اللغة</strong>: عربي أو إنجليزي<br>
+            • <strong>الوضع الليلي</strong>: تلقائي، نهاري، أو ليلي<br>
+            • <strong>اللون الأساسي</strong>: غير لون التطبيق زي ما تحب<br>
+            • <strong>المهلة الافتراضية</strong>: وقت انتظار الطلب<br>
+            • <strong>البروكسي</strong>: لو بتستخدم بروكسي<br>
+            • <strong>النسخ الاحتياطي</strong>: احفظ بياناتك<br>
+            • <strong>وضع المطور</strong>: أدوات متقدمة
+        </div>
+    </div>
+
+    <div class="tip">
+        <div class="tip-label">💡 نصيحة</div>
+        <div>فعّل <strong>النسخ الاحتياطي التلقائي</strong> عشان بياناتك ما تضيعش لو حصل أي حاجة للموبايل.</div>
+    </div>
+
+    <!-- Backup -->
+    <div class="chapter-header">
+        <div class="chapter-tag">النسخ الاحتياطي</div>
+        <div class="chapter-title">إزاي تحمي بياناتك</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            روح على <strong>الإعدادات → النسخ الاحتياطي والاستعادة</strong>.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            اضغط <strong>"إنشاء نسخة احتياطية جديدة"</strong>.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            تقدر <strong>تصدّر</strong> النسخة لملف وتشاركها.
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+            أو <strong>استورد</strong> نسخة احتياطية سابقة.
+        </div>
+    </div>
+
+    <!-- Tips & Tricks -->
+    <div class="chapter-header">
+        <div class="chapter-tag">نصائح</div>
+        <div class="chapter-title">نصائح وحيل مفيدة</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="tip">
+        <div class="tip-label">💡 استخدم المتغيرات</div>
+        <div>بدل ما تكتب الرابط كامل في كل مرة، استخدم متغيرات زي <code>{{base_url}}</code> و <code>{{api_key}}</code>. غير القيمة مرة واحدة وبتتغير في كل الطلبات!</div>
+    </div>
+
+    <div class="tip">
+        <div class="tip-label">💡 استخدم البيئات</div>
+        <div>اعمل بيئات مختلفة (تطوير، إنتاج، اختبار) وكل بيئة ليها متغيراتها. تبدل بين البيئات بضغطة واحدة.</div>
+    </div>
+
+    <div class="tip">
+        <div class="tip-label">💡 استخدم الكود الجاهز</div>
+        <div>بعد ما تبت طلب، اضغط على زر "توليد الكود" واختار اللغة اللي عايزها (Dart, Python, JavaScript, إلخ). التطبيق هيولّدلك الكود جاهز للنسخ!</div>
+    </div>
+
+    <div class="tip">
+        <div class="tip-label">💡 فعّل الـ AI</div>
+        <div>لو بتشتغل كتير مع APIs معقدة، فعّل الـ AI. هيوفرلك وقت كبير في فهم الأخطاء وتحسين الطلبات.</div>
+    </div>
+
+    <!-- Conclusion -->
+    <div class="chapter-header">
+        <div class="chapter-tag">الخلاصة</div>
+        <div class="chapter-title">كده انت جاهز!</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="body-text">
+        كده يا صاحبي، بقيت جاهز تستخدم <strong>Arabic HTTP Studio</strong> كأنك محترف! التطبيق ده فيه كل اللي تحتاجه عشان تشتغل مع APIs من موبايلك.
+    </div>
+    <div class="body-text">
+        لو عندك أي سؤال أو واجهتك مشكلة، تقدر تبلغنا على GitHub. ولو عندك اقتراحات لميزات جديدة، احنا دايماً سعداء نسمع منك!
+    </div>
+
+    <div class="card">
+        <div class="card-title">📞 تواصل معانا</div>
+        <div class="card-content">
+            • <strong>GitHub</strong>: github.com/Pasel11/arabic-http-studio<br>
+            • <strong>الإصدارات</strong>: حمّل أحدث نسخة من صفحة Releases<br>
+            • <strong>المساهمة</strong>: لو عايز تساهم في التطوير، اقرأ CONTRIBUTING.md
+        </div>
+    </div>
+
+</div>
+
+<!-- Ending -->
+<div class="ending">
+    <div class="ending-text">شكراً إنك استخدمت<br>Arabic HTTP Studio</div>
+    <div class="ending-sub">نتمنى لك تجربة ممتعة ومثمرة! 🚀</div>
+    <div class="ending-footer">الإصدار 2.0.0 | Enterprise Edition</div>
+</div>
+
+</body>
+</html>

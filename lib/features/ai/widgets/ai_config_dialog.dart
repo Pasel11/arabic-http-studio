@@ -4,14 +4,17 @@ import '../contracts/ai_provider.dart';
 import '../providers/ai_provider_registry.dart';
 import '../providers/ai_settings_provider.dart';
 import '../providers/openai_compatible_provider.dart';
+import '../providers/gemini_ai_provider.dart';
 
 /// Dialog for configuring AI providers.
 ///
-/// This dialog allows users to:
-/// - Enable/disable AI features
-/// - Select an AI provider
-/// - Configure API keys and endpoints
-/// - Test the connection
+/// Supports multiple AI providers:
+/// - OpenAI (and OpenAI-compatible APIs)
+/// - Google Gemini
+/// - Custom OpenAI-compatible endpoints
+///
+/// Each provider can be configured independently with API key,
+/// model selection, and optional base URL.
 class AiConfigDialog extends StatefulWidget {
   const AiConfigDialog({super.key});
 
@@ -37,10 +40,58 @@ class _AiConfigDialogState extends State<AiConfigDialog> {
         ? settings.activeProviderId
         : 'openai';
 
-    final config = settings.providers[_selectedProviderId];
+    _loadProviderConfig();
+  }
+
+  void _loadProviderConfig() {
+    final config = AiSettingsProvider.instance.settings.providers[_selectedProviderId];
     _apiKeyController.text = config?.apiKey ?? '';
     _baseUrlController.text = config?.baseUrl ?? '';
-    _modelController.text = config?.model ?? '';
+    _modelController.text = config?.model ?? _getDefaultModel();
+  }
+
+  String _getDefaultModel() {
+    switch (_selectedProviderId) {
+      case 'gemini':
+        return GeminiAiProvider.defaultModel;
+      case 'openai':
+      case 'custom':
+      default:
+        return 'gpt-3.5-turbo';
+    }
+  }
+
+  String _getDefaultHint() {
+    switch (_selectedProviderId) {
+      case 'gemini':
+        return GeminiAiProvider.defaultModel;
+      case 'openai':
+      case 'custom':
+      default:
+        return 'gpt-3.5-turbo';
+    }
+  }
+
+  String _getKeyHint() {
+    switch (_selectedProviderId) {
+      case 'gemini':
+        return 'AIza...';
+      case 'openai':
+      case 'custom':
+      default:
+        return 'sk-...';
+    }
+  }
+
+  String _getUrlHint() {
+    switch (_selectedProviderId) {
+      case 'gemini':
+        return 'https://generativelanguage.googleapis.com';
+      case 'openai':
+      case 'custom':
+      default:
+        return 'https://api.openai.com';
+    }
   }
 
   @override
@@ -49,6 +100,14 @@ class _AiConfigDialogState extends State<AiConfigDialog> {
     _baseUrlController.dispose();
     _modelController.dispose();
     super.dispose();
+  }
+
+  void _onProviderChanged(String providerId) {
+    setState(() {
+      _selectedProviderId = providerId;
+      _testResult = null;
+    });
+    _loadProviderConfig();
   }
 
   Future<void> _save() async {
@@ -67,9 +126,17 @@ class _AiConfigDialogState extends State<AiConfigDialog> {
     await AiSettingsProvider.instance.setActiveProvider(_selectedProviderId);
     await AiSettingsProvider.instance.setEnabled(_enabled);
 
-    // Register the provider instance
+    // Register the appropriate provider instance
     if (_enabled) {
-      final provider = OpenAiCompatibleProvider(config);
+      AiProvider? provider;
+      switch (_selectedProviderId) {
+        case 'gemini':
+          provider = GeminiAiProvider(config);
+        case 'openai':
+        case 'custom':
+        default:
+          provider = OpenAiCompatibleProvider(config);
+      }
       AiProviderRegistry.instance.register(provider);
     }
 
@@ -99,7 +166,16 @@ class _AiConfigDialogState extends State<AiConfigDialog> {
             : _modelController.text.trim(),
       );
 
-      final provider = OpenAiCompatibleProvider(config);
+      AiProvider provider;
+      switch (_selectedProviderId) {
+        case 'gemini':
+          provider = GeminiAiProvider(config);
+        case 'openai':
+        case 'custom':
+        default:
+          provider = OpenAiCompatibleProvider(config);
+      }
+
       final success = await provider.testConnection();
       provider.dispose();
 
@@ -144,14 +220,17 @@ class _AiConfigDialogState extends State<AiConfigDialog> {
                   ChoiceChip(
                     label: const Text('OpenAI'),
                     selected: _selectedProviderId == 'openai',
-                    onSelected: (_) =>
-                        setState(() => _selectedProviderId = 'openai'),
+                    onSelected: (_) => _onProviderChanged('openai'),
+                  ),
+                  ChoiceChip(
+                    label: const Text('Google Gemini'),
+                    selected: _selectedProviderId == 'gemini',
+                    onSelected: (_) => _onProviderChanged('gemini'),
                   ),
                   ChoiceChip(
                     label: const Text('مخصص'),
                     selected: _selectedProviderId == 'custom',
-                    onSelected: (_) =>
-                        setState(() => _selectedProviderId = 'custom'),
+                    onSelected: (_) => _onProviderChanged('custom'),
                   ),
                 ],
               ),
@@ -160,34 +239,60 @@ class _AiConfigDialogState extends State<AiConfigDialog> {
               // API Key
               TextField(
                 controller: _apiKeyController,
-                decoration: const InputDecoration(
-                  labelText: 'مفتاح API',
-                  hintText: 'sk-...',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: _selectedProviderId == 'gemini'
+                      ? 'Gemini API Key'
+                      : 'مفتاح API',
+                  hintText: _getKeyHint(),
+                  border: const OutlineInputBorder(),
                 ),
                 obscureText: true,
               ),
               const SizedBox(height: 12),
 
+              // Model
+              if (_selectedProviderId == 'gemini')
+                DropdownButtonFormField<String>(
+                  value: _modelController.text.isEmpty
+                      ? GeminiAiProvider.defaultModel
+                      : _modelController.text,
+                  decoration: const InputDecoration(
+                    labelText: 'النموذج',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: GeminiAiProvider.availableModels.map((model) {
+                    return DropdownMenuItem(
+                      value: model,
+                      child: Text(model),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      _modelController.text = value;
+                    }
+                  },
+                )
+              else
+                TextField(
+                  controller: _modelController,
+                  decoration: InputDecoration(
+                    labelText: 'النموذج (اختياري)',
+                    hintText: _getDefaultHint(),
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              const SizedBox(height: 12),
+
               // Base URL
               TextField(
                 controller: _baseUrlController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'الرابط الأساسي (اختياري)',
-                  hintText: 'https://api.openai.com',
-                  helperText: 'اتركه فارغًا لاستخدام OpenAI الافتراضي',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Model
-              TextField(
-                controller: _modelController,
-                decoration: const InputDecoration(
-                  labelText: 'النموذج (اختياري)',
-                  hintText: 'gpt-3.5-turbo',
-                  border: OutlineInputBorder(),
+                  hintText: _getUrlHint(),
+                  helperText: _selectedProviderId == 'gemini'
+                      ? 'اتركه فارغًا لاستخدام Gemini الافتراضي'
+                      : 'اتركه فارغًا لاستخدام OpenAI الافتراضي',
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
