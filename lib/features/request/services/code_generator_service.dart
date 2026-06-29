@@ -183,7 +183,7 @@ class CodeGeneratorService {
       }
       if (request.auth != null) {
         for (final entry in request.auth!.getAdditionalHeaders().entries) {
-          buffer.writeln('    "${entry.key}": "${_escapeString(entry.value)}",");
+          buffer.writeln('    "${entry.key}": "${_escapeString(entry.value)}",');
         }
       }
       buffer.writeln('}');

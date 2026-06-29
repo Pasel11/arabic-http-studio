@@ -134,7 +134,7 @@ class PerformanceMonitor {
     final cpuUsage = _getCpuUsage();
 
     // Get isolate count
-    final isolateCount = Isolate.current.debugName.isNotEmpty ? 1 : 1;
+    final isolateCount = (Isolate.current.debugName?.isNotEmpty ?? false) ? 1 : 1;
 
     _currentStats = PerformanceStats(
       fps: fps,
